@@ -1,193 +1,164 @@
 import * as cheerio from 'cheerio';
 
-const DELAY_BETWEEN_REQUESTS = 1000; // 1 second delay to be respectful
-
-// Helper function to delay between requests
+const DELAY_BETWEEN_REQUESTS = 1000;
 const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
-// Function to fetch and parse a single region's results
 async function fetchRegionResults(query, regionId, options = {}) {
   try {
     const { category, minPrice, maxPrice } = options;
+    let url = `https://www.daangn.com/kr/buy-sell/?in=${encodeURIComponent(regionId)}&search=${encodeURIComponent(query)}`;
     
-    // Build URL with parameters
-    let url = `https://www.daangn.com/kr/buy-sell/s/?in=${regionId}&search=${encodeURIComponent(query)}`;
-    
-    if (category) {
-      url += `&category_id=${category}`;
-    }
-    
-    if (minPrice && maxPrice) {
-      url += `&price=${minPrice}__${maxPrice}`;
-    } else if (minPrice) {
-      url += `&price=${minPrice}__`;
-    } else if (maxPrice) {
-      url += `&price=__${maxPrice}`;
-    }
+    if (category) url += `&category_id=${category}`;
+    if (minPrice && maxPrice) url += `&price=${minPrice}__${maxPrice}`;
+    else if (minPrice) url += `&price=${minPrice}__`;
+    else if (maxPrice) url += `&price=__${maxPrice}`;
 
     console.log(`Fetching: ${url}`);
     
     const response = await fetch(url, {
       headers: {
         'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
         'Accept-Language': 'ko-KR,ko;q=0.9,en;q=0.8',
-        'Accept-Encoding': 'gzip, deflate, br',
-        'DNT': '1',
-        'Connection': 'keep-alive',
-        'Upgrade-Insecure-Requests': '1',
       }
     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-    }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
     const html = await response.text();
     const $ = cheerio.load(html);
-    const items = [];
-
-    // Parse product listings
-    // 당근마켓의 상품 목록은 여러 가지 셀렉터로 나타날 수 있음
-    const selectors = [
-      'a[href*="/articles/"]', // 기본 상품 링크
-      '.flea-market-article', // 상품 카드
-      '[data-testid="article-card"]', // 테스트 ID 기반
-      'article a', // article 태그 안의 링크
-    ];
-
-    let foundItems = false;
     
-    for (const selector of selectors) {
-      const elements = $(selector);
-      if (elements.length > 0) {
-        console.log(`Found ${elements.length} items with selector: ${selector}`);
-        foundItems = true;
-        
-        elements.each((index, element) => {
-          const $item = $(element);
-          const link = $item.attr('href');
-          
-          if (!link || !link.includes('/articles/')) return;
-          
-          // Extract information from the link or surrounding elements
-          let title = '';
-          let price = '';
-          let location = '';
-          let time = '';
-          let thumbnail = '';
-
-          // Try to extract title
-          title = $item.find('h2, h3, .article-title, [data-testid="article-title"]').first().text().trim() ||
-                  $item.text().trim().split('\n')[0] ||
-                  $item.attr('title') || '';
-
-          // Try to extract price
-          const priceElement = $item.find('.price, .article-price, [data-testid="article-price"], .font-bold').first();
-          price = priceElement.text().trim();
-
-          // Try to extract location
-          const locationElement = $item.find('.region-name, .article-region, [data-testid="article-region"]').first();
-          location = locationElement.text().trim();
-
-          // Try to extract time
-          const timeElement = $item.find('.article-time, .time, [data-testid="article-time"]').first();
-          time = timeElement.text().trim();
-
-          // Try to extract thumbnail
-          const imgElement = $item.find('img').first();
-          thumbnail = imgElement.attr('src') || imgElement.attr('data-src') || '';
-
-          // If we couldn't extract much info, try parsing from the entire text content
-          if (!title && !price) {
-            const fullText = $item.text().trim();
-            const lines = fullText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
-            
-            if (lines.length > 0) {
-              title = lines[0];
-              
-              // Look for price in the lines (contains 원 or 만원)
-              const priceLine = lines.find(line => line.includes('원') && (line.includes('만') || /\d/.test(line)));
-              if (priceLine) price = priceLine;
-
-              // Look for location and time in remaining lines
-              const locationLine = lines.find(line => line.includes('동') || line.includes('구') || line.includes('시'));
-              if (locationLine) location = locationLine;
-
-              const timeLine = lines.find(line => line.includes('분') || line.includes('시간') || line.includes('일') || line.includes('전'));
-              if (timeLine) time = timeLine;
-            }
+    // Extract __remixContext from inline script
+    let remixData = null;
+    $('script').each((_, el) => {
+      const text = $(el).html();
+      if (text && text.includes('window.__remixContext')) {
+        try {
+          const match = text.match(/window\.__remixContext\s*=\s*({.+?})\s*;?\s*$/s);
+          if (match) {
+            remixData = JSON.parse(match[1]);
           }
-
-          // Only add if we have at least title or meaningful content
-          if (title || price) {
-            items.push({
-              title: title || '제목 없음',
-              price: price || '가격 미표시',
-              location: location || regionId.split('-')[0],
-              time: time || '',
-              thumbnail: thumbnail ? (thumbnail.startsWith('http') ? thumbnail : `https://www.daangn.com${thumbnail}`) : '',
-              link: link.startsWith('http') ? link : `https://www.daangn.com${link}`,
-              region: regionId.split('-')[0]
-            });
+        } catch (e) {
+          // Try alternative extraction
+          try {
+            const start = text.indexOf('{');
+            const jsonStr = text.substring(start).replace(/;\s*$/, '');
+            remixData = JSON.parse(jsonStr);
+          } catch (e2) {
+            console.log('Failed to parse remixContext');
           }
-        });
-        
-        break; // Stop after finding items with first working selector
+        }
       }
+    });
+
+    if (!remixData) {
+      console.log(`No remixContext found for ${regionId}`);
+      return [];
     }
 
-    if (!foundItems) {
-      console.log('No items found with any selector. HTML structure might have changed.');
-      // Log a sample of the HTML for debugging
-      console.log('Sample HTML:', $('body').html().substring(0, 500));
+    // Extract articles from loaderData
+    const loaderData = remixData?.state?.loaderData;
+    const pageData = loaderData?.['routes/kr.buy-sell._index'] || loaderData?.['routes/kr.buy-sell.s'] || {};
+    const articles = pageData?.allPage?.fleamarketArticles || pageData?.searchPage?.fleamarketArticles || [];
+
+    if (articles.length === 0) {
+      // Try to find articles in any loader key
+      for (const key of Object.keys(loaderData || {})) {
+        const d = loaderData[key];
+        const arts = d?.allPage?.fleamarketArticles || d?.searchPage?.fleamarketArticles || [];
+        if (arts.length > 0) {
+          return arts.map(a => formatArticle(a, regionId));
+        }
+      }
+      console.log(`No articles found in remixContext for ${regionId}`);
+      return [];
     }
 
-    return items;
+    return articles.map(a => formatArticle(a, regionId));
   } catch (error) {
     console.error(`Error fetching region ${regionId}:`, error.message);
     return [];
   }
 }
 
-// Main crawling function
+function formatArticle(article, regionId) {
+  const regionName = article.region?.name || article.regionId?.name || regionId.split('-')[0];
+  
+  // Format price
+  let price = '';
+  if (article.price) {
+    const num = parseFloat(article.price);
+    if (num === 0) {
+      price = '나눔';
+    } else {
+      price = num.toLocaleString('ko-KR') + '원';
+    }
+  } else {
+    price = '가격 미정';
+  }
+
+  // Format time
+  let time = '';
+  if (article.createdAt || article.boostedAt) {
+    const date = new Date(article.boostedAt || article.createdAt);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMin = Math.floor(diffMs / 60000);
+    const diffHour = Math.floor(diffMs / 3600000);
+    const diffDay = Math.floor(diffMs / 86400000);
+
+    if (diffMin < 1) time = '방금 전';
+    else if (diffMin < 60) time = `${diffMin}분 전`;
+    else if (diffHour < 24) time = `${diffHour}시간 전`;
+    else if (diffDay < 30) time = `${diffDay}일 전`;
+    else time = `${Math.floor(diffDay / 30)}개월 전`;
+    
+    if (article.boostedAt && article.boostedAt !== article.createdAt) {
+      time = '끌올 ' + time;
+    }
+  }
+
+  return {
+    title: article.title || '제목 없음',
+    price,
+    location: regionName,
+    time,
+    thumbnail: article.thumbnail || '',
+    link: article.href || (article.id ? `https://www.daangn.com${article.id}` : ''),
+    region: regionName,
+    status: article.status || ''
+  };
+}
+
 export async function crawlDaangn(query, regionIds, options = {}) {
   const allItems = [];
   
-  console.log(`Starting crawl for query: "${query}" across ${regionIds.length} regions`);
+  // 동 단위가 아니라 구 단위로 검색 가능 - regionId가 "구의동-6059" 형태
+  console.log(`Starting crawl for "${query}" across ${regionIds.length} regions`);
   
   for (let i = 0; i < regionIds.length; i++) {
     const regionId = regionIds[i];
-    console.log(`Processing region ${i + 1}/${regionIds.length}: ${regionId}`);
+    console.log(`Processing ${i + 1}/${regionIds.length}: ${regionId}`);
     
-    try {
-      const items = await fetchRegionResults(query, regionId, options);
-      allItems.push(...items);
-      console.log(`Found ${items.length} items in ${regionId}`);
-    } catch (error) {
-      console.error(`Failed to process region ${regionId}:`, error.message);
-    }
+    const items = await fetchRegionResults(query, regionId, options);
+    allItems.push(...items);
+    console.log(`Found ${items.length} items in ${regionId}`);
     
-    // Add delay between requests to be respectful
-    if (i < regionIds.length - 1) {
-      await delay(DELAY_BETWEEN_REQUESTS);
-    }
+    if (i < regionIds.length - 1) await delay(DELAY_BETWEEN_REQUESTS);
   }
   
-  // Remove duplicates based on link
-  const uniqueItems = allItems.filter((item, index, self) => 
-    index === self.findIndex(other => other.link === item.link)
-  );
-  
-  // Sort by time (newest first) - this is a simple sort, could be improved
-  // 당근마켓의 시간 표시를 파싱해서 정렬하는 로직
-  uniqueItems.sort((a, b) => {
-    const timeA = parseTimeToMinutes(a.time);
-    const timeB = parseTimeToMinutes(b.time);
-    return timeA - timeB; // 낮은 숫자 = 최근 시간
+  // Deduplicate by link
+  const seen = new Set();
+  const uniqueItems = allItems.filter(item => {
+    if (seen.has(item.link)) return false;
+    seen.add(item.link);
+    return true;
   });
   
-  console.log(`Total unique items found: ${uniqueItems.length}`);
+  // Sort newest first
+  uniqueItems.sort((a, b) => parseTimeToMinutes(a.time) - parseTimeToMinutes(b.time));
+  
+  console.log(`Total unique items: ${uniqueItems.length}`);
   
   return {
     query,
@@ -198,35 +169,17 @@ export async function crawlDaangn(query, regionIds, options = {}) {
   };
 }
 
-// Helper function to parse Korean time strings to minutes for sorting
 function parseTimeToMinutes(timeStr) {
-  if (!timeStr) return 999999; // Unknown time goes to the end
-  
-  const str = timeStr.toLowerCase();
-  
-  // 방금 전, 몇 초 전
-  if (str.includes('방금') || str.includes('초')) {
-    return 0;
-  }
-  
-  // X분 전
-  const minuteMatch = str.match(/(\d+)분/);
-  if (minuteMatch) {
-    return parseInt(minuteMatch[1]);
-  }
-  
-  // X시간 전
-  const hourMatch = str.match(/(\d+)시간/);
-  if (hourMatch) {
-    return parseInt(hourMatch[1]) * 60;
-  }
-  
-  // X일 전
-  const dayMatch = str.match(/(\d+)일/);
-  if (dayMatch) {
-    return parseInt(dayMatch[1]) * 24 * 60;
-  }
-  
-  // 기본적으로 오래된 것으로 처리
+  if (!timeStr) return 999999;
+  const s = timeStr;
+  if (s.includes('방금') || s.includes('초')) return 0;
+  const min = s.match(/(\d+)분/);
+  if (min) return parseInt(min[1]);
+  const hr = s.match(/(\d+)시간/);
+  if (hr) return parseInt(hr[1]) * 60;
+  const day = s.match(/(\d+)일/);
+  if (day) return parseInt(day[1]) * 1440;
+  const mon = s.match(/(\d+)개월/);
+  if (mon) return parseInt(mon[1]) * 43200;
   return 999999;
 }
