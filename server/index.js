@@ -210,7 +210,11 @@ app.get('/api/regions', (req, res) => {
 });
 
 // Serve the app for all other routes (SPA fallback)
-app.get('*', (req, res) => {
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist/index.html'));
+});
+
+app.use((req, res) => {
   res.sendFile(path.join(__dirname, '../dist/index.html'));
 });
 
