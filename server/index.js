@@ -14,24 +14,57 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../dist')));
 
-// Cache
+// Cache (30분)
 const cache = new Map();
-const CACHE_DURATION = 5 * 60 * 1000;
+const CACHE_DURATION = 30 * 60 * 1000;
+
+// Rate limit: IP당 분당 5회
+const rateLimitMap = new Map();
+const RATE_LIMIT = 5;
+const RATE_WINDOW = 60 * 1000;
+
+function checkRateLimit(ip) {
+  const now = Date.now();
+  if (!rateLimitMap.has(ip)) {
+    rateLimitMap.set(ip, [now]);
+    return true;
+  }
+  const timestamps = rateLimitMap.get(ip).filter(t => now - t < RATE_WINDOW);
+  if (timestamps.length >= RATE_LIMIT) return false;
+  timestamps.push(now);
+  rateLimitMap.set(ip, timestamps);
+  return true;
+}
+
+// 주기적으로 오래된 rate limit 데이터 정리
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, ts] of rateLimitMap) {
+    const valid = ts.filter(t => now - t < RATE_WINDOW);
+    if (valid.length === 0) rateLimitMap.delete(ip);
+    else rateLimitMap.set(ip, valid);
+  }
+}, 60000);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// Search API - regions는 대표동ID 리스트 (쉼표 구분)
+// Search API
 app.get('/api/search', async (req, res) => {
   try {
+    const ip = req.headers['x-forwarded-for'] || req.ip;
+    if (!checkRateLimit(ip)) {
+      return res.status(429).json({ error: '검색 횟수 초과! 1분에 5회까지 가능합니다.' });
+    }
+
     const { query, regions, category, minPrice, maxPrice } = req.query;
     if (!query || !regions) {
       return res.status(400).json({ error: 'query와 regions 필수' });
     }
 
     const regionList = regions.split(',');
-    const cacheKey = `${query}-${regions}-${category||''}-${minPrice||''}-${maxPrice|''}`;
+    const cacheKey = `${query}-${regions}-${category||''}-${minPrice||''}-${maxPrice||''}`;
     
     if (cache.has(cacheKey)) {
       const cached = cache.get(cacheKey);

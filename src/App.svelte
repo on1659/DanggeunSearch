@@ -49,6 +49,10 @@
       const ids = selectedRegions.map(r => r.regionId).join(',');
       const params = new URLSearchParams({ query: query.trim(), regions: ids });
       const res = await fetch(`/api/search?${params}`);
+      if (res.status === 429) {
+        const d = await res.json();
+        throw new Error(d.error || '검색 횟수 초과! 잠시 후 다시 시도해주세요.');
+      }
       if (!res.ok) throw new Error(`검색 실패 (${res.status})`);
       searchResults = await res.json();
     } catch (err) {
