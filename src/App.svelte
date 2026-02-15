@@ -20,6 +20,7 @@
   let searchWithinQuery = '';
   let filterRegion = '';
   let viewMode = 'list'; // 'list' | 'map'
+  let hideSoldOut = false; // 판매완료 제외
 
   // Custom Alert
   let showAlert = false;
@@ -58,6 +59,7 @@
       if (searchWithinQuery && !item.title.toLowerCase().includes(searchWithinQuery.toLowerCase()) &&
           !item.location.toLowerCase().includes(searchWithinQuery.toLowerCase())) return false;
       if (filterRegion && item.location !== filterRegion) return false;
+      if (hideSoldOut && item.status === 'SOLD_OUT') return false;
       return true;
     });
 
@@ -332,6 +334,14 @@
             <option value={20}>20개씩</option>
             <option value={50}>50개씩</option>
           </select>
+          <label>
+            <input
+              type="checkbox"
+              bind:checked={hideSoldOut}
+              on:change={() => currentPage = 1}
+            />
+            판매완료 제외
+          </label>
           <div class="filter-info">
             {filteredItems.length}개 표시 중
           </div>
@@ -495,12 +505,14 @@
   .empty { text-align:center; padding:2rem; color:#999; background:white; border-radius:10px; }
 
   .filter-controls { display:flex; gap:.5rem; margin-bottom:.75rem; flex-wrap:wrap; align-items:center; }
-  .filter-controls input { flex:1; min-width:150px; padding:.5rem; border:1px solid #ddd; border-radius:6px; font-size:.85rem; }
-  .filter-controls select { padding:.5rem; border:1px solid #ddd; border-radius:6px; font-size:.85rem; background:white; }
+  .filter-controls input { flex:1; min-width:150px; padding:.5rem; border:1px solid #ddd; border-radius:6px; font-size:.85rem; color:#333; }
+  .filter-controls select { padding:.5rem; border:1px solid #ddd; border-radius:6px; font-size:.85rem; background:white; color:#333; cursor:pointer; }
+  .filter-controls label { display:flex; align-items:center; gap:.3rem; font-size:.85rem; color:#333; cursor:pointer; }
+  .filter-controls input[type="checkbox"] { accent-color:#ff6f00; cursor:pointer; }
   .filter-info { font-size:.85rem; color:#666; padding:.5rem; }
 
   .pagination { display:flex; gap:.3rem; justify-content:center; margin-top:1rem; flex-wrap:wrap; }
-  .pagination button { padding:.4rem .7rem; border:1px solid #ddd; background:white; border-radius:6px; cursor:pointer; font-size:.85rem; min-width:40px; }
+  .pagination button { padding:.4rem .7rem; border:1px solid #ddd; background:white; color:#333; border-radius:6px; cursor:pointer; font-size:.85rem; min-width:40px; }
   .pagination button:hover:not(:disabled) { background:#f5f5f5; }
   .pagination button:disabled { opacity:.3; cursor:not-allowed; }
   .pagination button.active { background:#ff6f00; color:white; border-color:#ff6f00; font-weight:600; }
