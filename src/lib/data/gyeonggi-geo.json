@@ -1,0 +1,467 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "성남시 분당구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.105, 37.355], [127.155, 37.355], [127.155, 37.395],
+          [127.105, 37.395], [127.105, 37.355]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "성남시 수정구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.120, 37.420], [127.165, 37.420], [127.165, 37.455],
+          [127.120, 37.455], [127.120, 37.420]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "성남시 중원구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.130, 37.395], [127.170, 37.395], [127.170, 37.425],
+          [127.130, 37.425], [127.130, 37.395]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "수원시 장안구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.000, 37.285], [127.040, 37.285], [127.040, 37.315],
+          [127.000, 37.315], [127.000, 37.285]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "수원시 권선구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.960, 37.250], [127.000, 37.250], [127.000, 37.285],
+          [126.960, 37.285], [126.960, 37.250]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "수원시 팔달구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.000, 37.250], [127.040, 37.250], [127.040, 37.285],
+          [127.000, 37.285], [127.000, 37.250]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "수원시 영통구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.040, 37.250], [127.080, 37.250], [127.080, 37.285],
+          [127.040, 37.285], [127.040, 37.250]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "용인시 처인구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.180, 37.210], [127.240, 37.210], [127.240, 37.260],
+          [127.180, 37.260], [127.180, 37.210]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "용인시 기흥구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.100, 37.260], [127.150, 37.260], [127.150, 37.305],
+          [127.100, 37.305], [127.100, 37.260]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "용인시 수지구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.070, 37.305], [127.120, 37.305], [127.120, 37.345],
+          [127.070, 37.345], [127.070, 37.305]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "고양시 덕양구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.825, 37.650], [126.885, 37.650], [126.885, 37.700],
+          [126.825, 37.700], [126.825, 37.650]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "고양시 일산동구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.750, 37.650], [126.805, 37.650], [126.805, 37.695],
+          [126.750, 37.695], [126.750, 37.650]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "고양시 일산서구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.700, 37.660], [126.750, 37.660], [126.750, 37.705],
+          [126.700, 37.705], [126.700, 37.660]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "안양시 만안구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.900, 37.385], [126.945, 37.385], [126.945, 37.420],
+          [126.900, 37.420], [126.900, 37.385]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "안양시 동안구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.945, 37.385], [126.995, 37.385], [126.995, 37.425],
+          [126.945, 37.425], [126.945, 37.385]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "안산시 상록구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.820, 37.295], [126.870, 37.295], [126.870, 37.335],
+          [126.820, 37.335], [126.820, 37.295]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "안산시 단원구", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.750, 37.285], [126.805, 37.285], [126.805, 37.330],
+          [126.750, 37.330], [126.750, 37.285]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "부천시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.760, 37.485], [126.815, 37.485], [126.815, 37.525],
+          [126.760, 37.525], [126.760, 37.485]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "의정부시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.030, 37.730], [127.080, 37.730], [127.080, 37.775],
+          [127.030, 37.775], [127.030, 37.730]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "광명시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.850, 37.440], [126.895, 37.440], [126.895, 37.475],
+          [126.850, 37.475], [126.850, 37.440]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "평택시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.050, 36.980], [127.130, 36.980], [127.130, 37.050],
+          [127.050, 37.050], [127.050, 36.980]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "하남시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.195, 37.525], [127.245, 37.525], [127.245, 37.565],
+          [127.195, 37.565], [127.195, 37.525]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "파주시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.750, 37.760], [126.850, 37.760], [126.850, 37.850],
+          [126.750, 37.850], [126.750, 37.760]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "김포시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.650, 37.590], [126.720, 37.590], [126.720, 37.650],
+          [126.650, 37.650], [126.650, 37.590]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "화성시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.820, 37.150], [126.950, 37.150], [126.950, 37.250],
+          [126.820, 37.250], [126.820, 37.150]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "남양주시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.150, 37.600], [127.250, 37.600], [127.250, 37.690],
+          [127.150, 37.690], [127.150, 37.600]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "구리시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.125, 37.580], [127.165, 37.580], [127.165, 37.615],
+          [127.125, 37.615], [127.125, 37.580]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "시흥시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.780, 37.360], [126.850, 37.360], [126.850, 37.420],
+          [126.780, 37.420], [126.780, 37.360]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "군포시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.920, 37.345], [126.970, 37.345], [126.970, 37.380],
+          [126.920, 37.380], [126.920, 37.345]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "의왕시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.960, 37.330], [127.005, 37.330], [127.005, 37.365],
+          [126.960, 37.365], [126.960, 37.330]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "이천시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.400, 37.250], [127.500, 37.250], [127.500, 37.330],
+          [127.400, 37.330], [127.400, 37.250]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "안성시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.250, 37.000], [127.340, 37.000], [127.340, 37.070],
+          [127.250, 37.070], [127.250, 37.000]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "과천시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.980, 37.420], [127.015, 37.420], [127.015, 37.445],
+          [126.980, 37.445], [126.980, 37.420]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "오산시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.060, 37.140], [127.100, 37.140], [127.100, 37.175],
+          [127.060, 37.175], [127.060, 37.140]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "광주시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.230, 37.400], [127.310, 37.400], [127.310, 37.470],
+          [127.230, 37.470], [127.230, 37.400]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "양주시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.990, 37.780], [127.070, 37.780], [127.070, 37.850],
+          [126.990, 37.850], [126.990, 37.780]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "포천시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.150, 37.850], [127.280, 37.850], [127.280, 37.950],
+          [127.150, 37.950], [127.150, 37.850]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "여주시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.570, 37.270], [127.670, 37.270], [127.670, 37.350],
+          [127.570, 37.350], [127.570, 37.270]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "동두천시", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.050, 37.890], [127.100, 37.890], [127.100, 37.930],
+          [127.050, 37.930], [127.050, 37.890]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "연천군", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.000, 38.050], [127.130, 38.050], [127.130, 38.150],
+          [127.000, 38.150], [127.000, 38.050]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "가평군", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.450, 37.800], [127.570, 37.800], [127.570, 37.900],
+          [127.450, 37.900], [127.450, 37.800]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "양평군", "province": "경기도" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.450, 37.450], [127.570, 37.450], [127.570, 37.550],
+          [127.450, 37.550], [127.450, 37.450]
+        ]]
+      }
+    }
+  ]
+}

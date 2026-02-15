@@ -1,0 +1,280 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "강남구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.047, 37.495], [127.095, 37.495], [127.095, 37.525],
+          [127.047, 37.525], [127.047, 37.495]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "서초구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.000, 37.470], [127.047, 37.470], [127.047, 37.510],
+          [127.000, 37.510], [127.000, 37.470]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "송파구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.095, 37.495], [127.145, 37.495], [127.145, 37.525],
+          [127.095, 37.525], [127.095, 37.495]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "강동구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.145, 37.520], [127.185, 37.520], [127.185, 37.555],
+          [127.145, 37.555], [127.145, 37.520]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "강서구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.800, 37.540], [126.850, 37.540], [126.850, 37.575],
+          [126.800, 37.575], [126.800, 37.540]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "양천구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.850, 37.515], [126.900, 37.515], [126.900, 37.545],
+          [126.850, 37.545], [126.850, 37.515]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "영등포구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.890, 37.515], [126.935, 37.515], [126.935, 37.545],
+          [126.890, 37.545], [126.890, 37.515]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "동작구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.935, 37.495], [126.980, 37.495], [126.980, 37.520],
+          [126.935, 37.520], [126.935, 37.495]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "관악구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.935, 37.465], [126.985, 37.465], [126.985, 37.495],
+          [126.935, 37.495], [126.935, 37.465]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "금천구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.885, 37.445], [126.925, 37.445], [126.925, 37.475],
+          [126.885, 37.475], [126.885, 37.445]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "구로구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.850, 37.485], [126.895, 37.485], [126.895, 37.515],
+          [126.850, 37.515], [126.850, 37.485]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "마포구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.925, 37.545], [126.970, 37.545], [126.970, 37.575],
+          [126.925, 37.575], [126.925, 37.545]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "용산구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.965, 37.530], [127.010, 37.530], [127.010, 37.555],
+          [126.965, 37.555], [126.965, 37.530]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "중구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.985, 37.555], [127.020, 37.555], [127.020, 37.575],
+          [126.985, 37.575], [126.985, 37.555]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "성동구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.020, 37.550], [127.060, 37.550], [127.060, 37.575],
+          [127.020, 37.575], [127.020, 37.550]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "광진구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.060, 37.535], [127.105, 37.535], [127.105, 37.565],
+          [127.060, 37.565], [127.060, 37.535]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "종로구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.965, 37.575], [127.010, 37.575], [127.010, 37.605],
+          [126.965, 37.605], [126.965, 37.575]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "서대문구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.925, 37.570], [126.965, 37.570], [126.965, 37.600],
+          [126.925, 37.600], [126.925, 37.570]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "은평구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.910, 37.590], [126.950, 37.590], [126.950, 37.630],
+          [126.910, 37.630], [126.910, 37.590]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "동대문구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.025, 37.575], [127.065, 37.575], [127.065, 37.605],
+          [127.025, 37.605], [127.025, 37.575]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "중랑구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.075, 37.590], [127.115, 37.590], [127.115, 37.620],
+          [127.075, 37.620], [127.075, 37.590]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "성북구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.000, 37.595], [127.045, 37.595], [127.045, 37.625],
+          [127.000, 37.625], [127.000, 37.595]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "강북구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [126.975, 37.620], [127.020, 37.620], [127.020, 37.650],
+          [126.975, 37.650], [126.975, 37.620]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "도봉구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.020, 37.645], [127.060, 37.645], [127.060, 37.680],
+          [127.020, 37.680], [127.020, 37.645]
+        ]]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "노원구", "province": "서울특별시" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [[
+          [127.055, 37.630], [127.100, 37.630], [127.100, 37.665],
+          [127.055, 37.665], [127.055, 37.630]
+        ]]
+      }
+    }
+  ]
+}

@@ -75,24 +75,21 @@
     return ids.length > 0 && ids.every(id => isSelected(id));
   }
 
-  function isSomeSelected(province) {
-    const ids = Object.values(regions[province] || {});
-    return ids.some(id => isSelected(id)) && !isAllSelected(province);
-  }
-
   function toggleAllDistricts(province) {
     const districts = regions[province] || {};
     if (isAllSelected(province)) {
-      // 전체 해제
+      // 모두 해제
       selectedRegions = selectedRegions.filter(
         r => !Object.values(districts).includes(r.regionId)
       );
     } else {
-      // 전체 선택
+      // 모두 선택 (기존 체크 상관없이 전부 선택)
+      const districtIds = Object.values(districts);
+      selectedRegions = selectedRegions.filter(
+        r => !districtIds.includes(r.regionId)
+      );
       Object.entries(districts).forEach(([name, id]) => {
-        if (!isSelected(id)) {
-          selectedRegions = [...selectedRegions, { province, district: name, regionId: id }];
-        }
+        selectedRegions = [...selectedRegions, { province, district: name, regionId: id }];
       });
     }
   }
@@ -226,14 +223,13 @@
 
             {#if selectedProvince}
               <div class="districts">
-              <label class="select-all" class:checked={isAllSelected(selectedProvince)} class:indeterminate={isSomeSelected(selectedProvince)}>
+              <label class="select-all" class:checked={isAllSelected(selectedProvince)}>
                 <input
                   type="checkbox"
                   checked={isAllSelected(selectedProvince)}
-                  indeterminate={isSomeSelected(selectedProvince)}
                   on:change={() => toggleAllDistricts(selectedProvince)}
                 />
-                <strong>모두 선택</strong>
+                <strong>{isAllSelected(selectedProvince) ? '모두 해제' : '모두 선택'}</strong>
               </label>
               {#each districts as [name, id]}
                 <label class:checked={isSelected(id)}>
@@ -403,7 +399,7 @@
   .picker { margin-top:.8rem; border-top:1px solid #eee; padding-top:.8rem; }
 
   .tabs { display:flex; gap:.5rem; margin-bottom:.8rem; }
-  .tabs button { flex:1; padding:.6rem; border:1px solid #ddd; background:white; border-radius:8px; cursor:pointer; font-size:.9rem; font-weight:500; transition:all .2s; }
+  .tabs button { flex:1; padding:.6rem; border:1px solid #ddd; background:white; color:#333; border-radius:8px; cursor:pointer; font-size:.9rem; font-weight:500; transition:all .2s; }
   .tabs button:hover { background:#f5f5f5; }
   .tabs button.active { background:#ff6f00; color:white; border-color:#ff6f00; }
 
@@ -417,7 +413,6 @@
   .districts label.checked { background:#fff3e0; font-weight:500; }
   .districts .select-all { grid-column:1/-1; background:#f9f9f9; border:1px solid #e0e0e0; margin-bottom:.3rem; }
   .districts .select-all.checked { background:#ffe0b2; border-color:#ff6f00; }
-  .districts .select-all.indeterminate { background:#fff3e0; border-color:#ffb74d; }
   .districts input[type="checkbox"] { accent-color:#ff6f00; }
 
   .error { background:#fff3e0; color:#e65100; padding:.6rem; border-radius:8px; margin-bottom:.75rem; font-size:.9rem; }
