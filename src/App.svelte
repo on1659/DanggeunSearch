@@ -22,6 +22,7 @@
   let viewMode = 'list'; // 'list' | 'map'
   let hideSoldOut = false; // 판매완료 제외
   let lastCenterItemId = null; // 현재 화면 중앙 아이템 추적
+  let hasSeenWarning = false; // 세션당 한 번만 경고 표시
 
   // Custom Alert
   let showAlert = false;
@@ -232,8 +233,9 @@
       return;
     }
     
-    // 검색 전 필수 안내
-    const warningMessage = `
+    // 검색 전 필수 안내 (세션당 최초 1회만)
+    if (!hasSeenWarning) {
+      const warningMessage = `
 이 검색기는 당근마켓 웹사이트를 크롤링하는 보조 도구입니다.
 
 ⚠️ 주의사항:
@@ -243,10 +245,13 @@
 • 개인적, 비상업적 용도로만 사용해주세요
 
 검색을 계속하시겠습니까?
-    `.trim();
-    
-    const confirmed = await customConfirm(warningMessage, '⚠️ 검색 전 필수 안내');
-    if (!confirmed) return;
+      `.trim();
+      
+      const confirmed = await customConfirm(warningMessage, '⚠️ 검색 전 필수 안내');
+      if (!confirmed) return;
+      
+      hasSeenWarning = true;
+    }
     
     if (selectedRegions.length > 20) {
       const confirmed2 = await customConfirm(
