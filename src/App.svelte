@@ -404,7 +404,7 @@
   .tabs button.active { background:#ff6f00; color:white; border-color:#ff6f00; }
 
   .provinces { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.6rem; }
-  .provinces button { padding:.35rem .7rem; border:1px solid #ddd; border-radius:16px; background:white; cursor:pointer; font-size:.82rem; }
+  .provinces button { padding:.35rem .7rem; border:1px solid #ddd; border-radius:16px; background:white; color:#333; cursor:pointer; font-size:.82rem; }
   .provinces button.active { background:#ff6f00; color:white; border-color:#ff6f00; }
 
   .districts { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:.2rem; }
