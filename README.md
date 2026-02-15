@@ -26,7 +26,7 @@
 ## 🚀 배포 정보
 
 - **GitHub**: [on1659/DanggeunSearch](https://github.com/on1659/DanggeunSearch)
-- **Live Demo**: [https://danggeunsearch-production.up.railway.app](https://danggeunsearch-production.up.railway.app)
+- **Live Demo**: [https://daangn-search.up.railway.app](https://daangn-search.up.railway.app)
 - **Railway Project**: [Dashboard](https://railway.com/project/8ea15b40-b922-468d-abfb-f3d8256d18a9)
 
 ## 🏃‍♂️ 로컬 개발
