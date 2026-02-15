@@ -3,6 +3,7 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { crawlDaangn } from './crawler.js';
+import { logSearch, getRecentSearches, getPopularSearches, getUserSearches } from './database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -58,17 +59,26 @@ app.get('/api/search', async (req, res) => {
       return res.status(429).json({ error: '검색 횟수 초과! 1분에 5회까지 가능합니다.' });
     }
 
-    const { query, regions, category, minPrice, maxPrice } = req.query;
+    const { query, regions, category, minPrice, maxPrice, userName } = req.query;
     if (!query || !regions) {
       return res.status(400).json({ error: 'query와 regions 필수' });
     }
 
     const regionList = regions.split(',');
     const cacheKey = `${query}-${regions}-${category||''}-${minPrice||''}-${maxPrice||''}`;
-    
+
     if (cache.has(cacheKey)) {
       const cached = cache.get(cacheKey);
       if (Date.now() - cached.timestamp < CACHE_DURATION) {
+        // 캐시된 결과도 로그에 기록
+        logSearch({
+          userName: userName,
+          query: query,
+          regions: regionList,
+          regionCount: regionList.length,
+          resultCount: cached.data.totalItems,
+          ipAddress: ip
+        });
         return res.json(cached.data);
       }
       cache.delete(cacheKey);
@@ -76,9 +86,55 @@ app.get('/api/search', async (req, res) => {
 
     const results = await crawlDaangn(query, regionList, { category, minPrice, maxPrice });
     cache.set(cacheKey, { data: results, timestamp: Date.now() });
+
+    // 검색 기록 저장
+    logSearch({
+      userName: userName,
+      query: query,
+      regions: regionList,
+      regionCount: regionList.length,
+      resultCount: results.totalItems,
+      ipAddress: ip
+    });
+
     res.json(results);
   } catch (error) {
     console.error('Search error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 검색 기록 API
+app.get('/api/search-logs/recent', (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 50;
+    const logs = getRecentSearches(limit);
+    res.json(logs);
+  } catch (error) {
+    console.error('Error fetching recent searches:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/search-logs/popular', (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const popular = getPopularSearches(limit);
+    res.json(popular);
+  } catch (error) {
+    console.error('Error fetching popular searches:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/search-logs/user/:userName', (req, res) => {
+  try {
+    const { userName } = req.params;
+    const limit = parseInt(req.query.limit) || 20;
+    const logs = getUserSearches(userName, limit);
+    res.json(logs);
+  } catch (error) {
+    console.error('Error fetching user searches:', error);
     res.status(500).json({ error: error.message });
   }
 });

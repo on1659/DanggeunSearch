@@ -169,7 +169,11 @@
 
     try {
       const ids = selectedRegions.map(r => r.regionId).join(',');
-      const params = new URLSearchParams({ query: query.trim(), regions: ids });
+      const params = new URLSearchParams({
+        query: query.trim(),
+        regions: ids,
+        userName: userName || 'Anonymous'
+      });
       const res = await fetch(`/api/search?${params}`);
       if (res.status === 429) {
         const d = await res.json();
