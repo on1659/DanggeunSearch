@@ -407,7 +407,7 @@
   .provinces button { padding:.35rem .7rem; border:1px solid #ddd; border-radius:16px; background:white; color:#333; cursor:pointer; font-size:.82rem; }
   .provinces button.active { background:#ff6f00; color:white; border-color:#ff6f00; }
 
-  .districts { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:.2rem; }
+  .districts { display:grid; grid-template-columns:repeat(2, 1fr); gap:.2rem; max-width:100%; }
   .districts label { display:flex; align-items:center; gap:.35rem; padding:.45rem .4rem; border-radius:6px; cursor:pointer; font-size:.88rem; }
   .districts label:hover { background:#f5f5f5; }
   .districts label.checked { background:#fff3e0; font-weight:500; }
