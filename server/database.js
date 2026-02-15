@@ -47,6 +47,13 @@ db.exec(`
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
     UNIQUE(user_name, item_link)
   );
+
+  CREATE TABLE IF NOT EXISTS login_logs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_name TEXT NOT NULL,
+    ip_address TEXT,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+  );
 `);
 
 console.log('✅ Database initialized:', dbPath);
@@ -202,6 +209,33 @@ export function getBookmarks(userName) {
 export function isBookmarked(userName, itemLink) {
   const stmt = db.prepare('SELECT id FROM bookmarks WHERE user_name = ? AND item_link = ?');
   return stmt.get(userName, itemLink) !== undefined;
+}
+
+// 로그인 기록 저장
+export function logLogin(userName, ipAddress) {
+  try {
+    const stmt = db.prepare(`
+      INSERT INTO login_logs (user_name, ip_address)
+      VALUES (?, ?)
+    `);
+    const result = stmt.run(userName, ipAddress);
+    console.log(`📝 Login logged: ${userName} from ${ipAddress}`);
+    return result.lastInsertRowid;
+  } catch (error) {
+    console.error('Error logging login:', error);
+    return null;
+  }
+}
+
+// 로그인 기록 조회
+export function getLoginLogs(userName, limit = 10) {
+  const stmt = db.prepare(`
+    SELECT * FROM login_logs
+    WHERE user_name = ?
+    ORDER BY timestamp DESC
+    LIMIT ?
+  `);
+  return stmt.all(userName, limit);
 }
 
 export default db;

@@ -12,7 +12,9 @@ import {
   getClickedItems,
   addBookmark,
   removeBookmark,
-  getBookmarks
+  getBookmarks,
+  logLogin,
+  getLoginLogs
 } from './database.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -145,6 +147,35 @@ app.get('/api/search-logs/user/:userName', (req, res) => {
     res.json(logs);
   } catch (error) {
     console.error('Error fetching user searches:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 로그인 기록 저장 API
+app.post('/api/login', (req, res) => {
+  try {
+    const { userName } = req.body;
+    const ip = req.headers['x-forwarded-for'] || req.ip;
+    if (!userName) {
+      return res.status(400).json({ error: 'userName 필수' });
+    }
+    logLogin(userName, ip);
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error logging login:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 로그인 기록 조회 API
+app.get('/api/login-logs/:userName', (req, res) => {
+  try {
+    const { userName } = req.params;
+    const limit = parseInt(req.query.limit) || 10;
+    const logs = getLoginLogs(userName, limit);
+    res.json(logs);
+  } catch (error) {
+    console.error('Error fetching login logs:', error);
     res.status(500).json({ error: error.message });
   }
 });

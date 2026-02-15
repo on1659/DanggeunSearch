@@ -169,10 +169,33 @@
     }
   }
 
+  function handleLogout() {
+    // 상태 초기화
+    isLoggedIn = false;
+    userName = '';
+    query = '';
+    selectedRegions = [];
+    searchResults = null;
+    bookmarkedLinks = new Set();
+    currentPage_mode = 'search';
+    hasSeenWarning = false;
+  }
+
   async function handleLogin() {
     if (!userName.trim()) {
       await customAlert('이름을 입력해주세요', '⚠️ 입력 필요');
       return;
+    }
+    
+    // 로그인 기록 저장
+    try {
+      await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userName: userName.trim() })
+      });
+    } catch (err) {
+      console.error('로그인 기록 저장 실패:', err);
     }
     
     // 로그인 성공
@@ -389,9 +412,15 @@
         <p>여러 지역 매물을 한번에</p>
       </div>
       <div class="header-right">
-        <button class="mypage-btn" on:click={() => currentPage_mode = 'mypage'}>
-          👤
-        </button>
+        {#if currentPage_mode === 'mypage'}
+          <button class="logout-btn" on:click={handleLogout}>
+            로그아웃
+          </button>
+        {:else}
+          <button class="mypage-btn" on:click={() => currentPage_mode = 'mypage'}>
+            👤
+          </button>
+        {/if}
       </div>
     </header>
 
@@ -768,9 +797,23 @@
     pointer-events:all;
   }
   .back-btn:hover,
-  .mypage-btn:hover {
+  .mypage-btn:hover,
+  .logout-btn:hover {
     background:rgba(255,255,255,0.3);
     transform:translateY(-1px);
+  }
+  .logout-btn {
+    background:rgba(255,255,255,0.2);
+    border:none;
+    color:white;
+    padding:.6rem .8rem;
+    border-radius:10px;
+    font-size:.85rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .2s;
+    backdrop-filter:blur(10px);
+    white-space:nowrap;
   }
 
   /* 컨테이너 */

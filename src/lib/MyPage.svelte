@@ -3,9 +3,10 @@
   
   export let userName = '';
 
-  let activeTab = 'clicked'; // 'clicked' | 'bookmarks'
+  let activeTab = 'clicked'; // 'clicked' | 'bookmarks' | 'login-logs'
   let clickedItems = [];
   let bookmarks = [];
+  let loginLogs = [];
   let loading = false;
 
   onMount(async () => {
@@ -25,6 +26,12 @@
       const bookmarkRes = await fetch(`/api/bookmarks/${encodeURIComponent(userName)}`);
       if (bookmarkRes.ok) {
         bookmarks = await bookmarkRes.json();
+      }
+
+      // 로그인 기록 로드
+      const loginRes = await fetch(`/api/login-logs/${encodeURIComponent(userName)}`);
+      if (loginRes.ok) {
+        loginLogs = await loginRes.json();
       }
     } catch (err) {
       console.error('데이터 로드 실패:', err);
@@ -66,6 +73,12 @@
     >
       ⭐ 북마크 ({bookmarks.length}/10)
     </button>
+    <button 
+      class:active={activeTab === 'login-logs'}
+      on:click={() => activeTab = 'login-logs'}
+    >
+      🔐 로그인 기록
+    </button>
   </div>
 
   {#if loading}
@@ -94,7 +107,7 @@
         {/each}
       </div>
     {/if}
-  {:else}
+  {:else if activeTab === 'bookmarks'}
     {#if bookmarks.length === 0}
       <div class="empty">북마크한 매물이 없습니다</div>
     {:else}
@@ -119,6 +132,22 @@
               ✕
             </button>
           </a>
+        {/each}
+      </div>
+    {/if}
+  {:else}
+    {#if loginLogs.length === 0}
+      <div class="empty">로그인 기록이 없습니다</div>
+    {:else}
+      <div class="login-logs">
+        {#each loginLogs as log}
+          <div class="log-item">
+            <div class="log-icon">🔐</div>
+            <div class="log-info">
+              <div class="log-time">{new Date(log.timestamp).toLocaleString('ko-KR')}</div>
+              <div class="log-ip">IP: {log.ip_address}</div>
+            </div>
+          </div>
         {/each}
       </div>
     {/if}
@@ -311,5 +340,43 @@
   .remove-btn:hover {
     background:rgba(0,0,0,0.7);
     transform:scale(1.1);
+  }
+
+  .login-logs {
+    display:flex;
+    flex-direction:column;
+    gap:.8rem;
+  }
+
+  .log-item {
+    display:flex;
+    align-items:center;
+    gap:1rem;
+    background:white;
+    border-radius:16px;
+    padding:1.2rem;
+    box-shadow:0 2px 8px rgba(0,0,0,.05), 0 0 0 1px rgba(0,0,0,.02);
+  }
+
+  .log-icon {
+    font-size:2rem;
+    flex-shrink:0;
+  }
+
+  .log-info {
+    flex:1;
+    min-width:0;
+  }
+
+  .log-time {
+    font-size:.95rem;
+    font-weight:600;
+    color:#212121;
+    margin-bottom:.3rem;
+  }
+
+  .log-ip {
+    font-size:.85rem;
+    color:#9e9e9e;
   }
 </style>
