@@ -436,7 +436,8 @@
   .login-box { background:white; border-radius:20px; padding:2.5rem 2rem; box-shadow:0 10px 40px rgba(0,0,0,.2); text-align:center; max-width:400px; width:90%; }
   .login-box h1 { margin:0 0 .5rem; font-size:2rem; color:#ff6f00; }
   .login-box p { margin:0 0 2rem; color:#666; font-size:.95rem; }
-  .login-box input { width:100%; padding:.9rem; border:2px solid #ddd; border-radius:10px; font-size:1rem; margin-bottom:1rem; }
+  .login-box input { width:100%; padding:.9rem; border:2px solid #ddd; border-radius:10px; font-size:1rem; margin-bottom:1rem; background:white; color:#333; }
+  .login-box input::placeholder { color:#999; }
   .login-box input:focus { outline:none; border-color:#ff6f00; }
   .login-box button { width:100%; padding:.9rem; background:#ff6f00; color:white; border:none; border-radius:10px; font-size:1rem; font-weight:600; cursor:pointer; transition:background .2s; }
   .login-box button:hover { background:#e65100; }
@@ -448,10 +449,13 @@
   .container { max-width:600px; margin:0 auto; padding:.75rem; }
 
   .search-bar { display:flex; gap:.5rem; margin-bottom:.75rem; }
-  .search-bar input { flex:1; padding:.7rem; border:2px solid #ddd; border-radius:8px; font-size:1rem; }
+  .search-bar input { flex:1; padding:.7rem; border:2px solid #ddd; border-radius:8px; font-size:1rem; background:white; color:#333; }
+  .search-bar input::placeholder { color:#999; }
   .search-bar input:focus { outline:none; border-color:#ff6f00; }
-  .search-bar button { padding:.7rem 1.2rem; background:#ff6f00; color:white; border:none; border-radius:8px; font-size:.95rem; font-weight:600; cursor:pointer; }
-  .search-bar button:disabled { background:#ccc; }
+  .search-bar input:disabled { background:#f5f5f5; color:#999; cursor:not-allowed; }
+  .search-bar button { padding:.7rem 1.2rem; background:#ff6f00; color:white; border:none; border-radius:8px; font-size:.95rem; font-weight:600; cursor:pointer; transition:background .2s; }
+  .search-bar button:hover:not(:disabled) { background:#e65100; }
+  .search-bar button:disabled { background:#ccc; cursor:not-allowed; }
 
   .region-section { background:white; border-radius:10px; padding:.8rem; margin-bottom:.75rem; box-shadow:0 1px 3px rgba(0,0,0,.06); }
   .region-toggle { width:100%; display:flex; align-items:center; gap:.5rem; background:none; border:none; font-size:.95rem; font-weight:600; cursor:pointer; padding:0; color:#333; }
@@ -461,7 +465,8 @@
   .selected-tags { display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.6rem; align-items:center; }
   .tag { background:#ff6f00; color:white; padding:.2rem .5rem; border-radius:12px; font-size:.8rem; display:flex; align-items:center; gap:.2rem; }
   .tag-x { background:none; border:none; color:white; cursor:pointer; font-size:.9rem; padding:0; }
-  .tag-clear { background:none; border:1px solid #ccc; color:#999; padding:.2rem .5rem; border-radius:12px; font-size:.75rem; cursor:pointer; }
+  .tag-clear { background:white; border:1px solid #ccc; color:#666; padding:.2rem .5rem; border-radius:12px; font-size:.75rem; cursor:pointer; transition:all .2s; }
+  .tag-clear:hover { background:#f5f5f5; border-color:#999; color:#333; }
 
   .picker { margin-top:.8rem; border-top:1px solid #eee; padding-top:.8rem; }
 
@@ -471,7 +476,8 @@
   .tabs button.active { background:#ff6f00; color:white; border-color:#ff6f00; }
 
   .provinces { display:flex; gap:.4rem; flex-wrap:wrap; margin-bottom:.6rem; }
-  .provinces button { padding:.35rem .7rem; border:1px solid #ddd; border-radius:16px; background:white; color:#333; cursor:pointer; font-size:.82rem; }
+  .provinces button { padding:.35rem .7rem; border:1px solid #ddd; border-radius:16px; background:white; color:#333; cursor:pointer; font-size:.82rem; transition:all .2s; }
+  .provinces button:hover:not(.active) { background:#f5f5f5; border-color:#bbb; }
   .provinces button.active { background:#ff6f00; color:white; border-color:#ff6f00; }
 
   .districts { display:grid; grid-template-columns:repeat(2, 1fr); gap:.2rem; max-width:100%; }
@@ -511,9 +517,12 @@
   .empty { text-align:center; padding:2rem; color:#999; background:white; border-radius:10px; }
 
   .filter-controls { display:flex; gap:.5rem; margin-bottom:.75rem; flex-wrap:wrap; align-items:center; }
-  .filter-controls input { flex:1; min-width:150px; padding:.5rem; border:1px solid #ddd; border-radius:6px; font-size:.85rem; color:#333; }
+  .filter-controls input { flex:1; min-width:150px; padding:.5rem; border:1px solid #ddd; border-radius:6px; font-size:.85rem; color:#333; background:white; }
+  .filter-controls input::placeholder { color:#999; }
   .filter-controls select { padding:.5rem; border:1px solid #ddd; border-radius:6px; font-size:.85rem; background:white; color:#333; cursor:pointer; }
-  .filter-controls label { display:flex; align-items:center; gap:.3rem; font-size:.85rem; color:#333; cursor:pointer; }
+  .filter-controls select option { background:white; color:#333; }
+  .filter-controls label { display:flex; align-items:center; gap:.3rem; font-size:.85rem; color:#333; cursor:pointer; white-space:nowrap; }
+  .filter-controls label:hover { color:#ff6f00; }
   .filter-controls input[type="checkbox"] { accent-color:#ff6f00; cursor:pointer; }
   .filter-info { font-size:.85rem; color:#666; padding:.5rem; }
 
