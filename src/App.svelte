@@ -59,7 +59,8 @@
       if (searchWithinQuery && !item.title.toLowerCase().includes(searchWithinQuery.toLowerCase()) &&
           !item.location.toLowerCase().includes(searchWithinQuery.toLowerCase())) return false;
       if (filterRegion && item.location !== filterRegion) return false;
-      if (hideSoldOut && item.status === 'SOLD_OUT') return false;
+      // Ongoing = 판매중, Reserved = 예약중, 그 외 = 판매완료
+      if (hideSoldOut && item.status && item.status !== 'Ongoing' && item.status !== 'Reserved') return false;
       return true;
     });
 
@@ -353,7 +354,7 @@
 
         <div class="items">
           {#each paginatedItems as item}
-            <a class="item" class:sold-out={item.status === 'SOLD_OUT'} href={item.link} target="_blank" rel="noopener">
+            <a class="item" class:sold-out={item.status && item.status !== 'Ongoing' && item.status !== 'Reserved'} href={item.link} target="_blank" rel="noopener">
               {#if item.thumbnail}
                 <img src={item.thumbnail} alt="" loading="lazy" />
               {:else}
@@ -364,8 +365,8 @@
                   <div class="title">{item.title}</div>
                   {#if item.status}
                     <span class="status-badge {item.status.toLowerCase()}">
-                      {item.status === 'SELLING' ? '판매중' :
-                       item.status === 'RESERVED' ? '예약중' : '판매완료'}
+                      {item.status === 'Ongoing' ? '판매중' :
+                       item.status === 'Reserved' ? '예약중' : '판매완료'}
                     </span>
                   {/if}
                 </div>
@@ -500,9 +501,10 @@
   .title-row { display:flex; align-items:center; gap:.4rem; margin-bottom:.2rem; }
   .title { font-weight:600; font-size:.9rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; flex:1; min-width:0; }
   .status-badge { padding:.15rem .4rem; border-radius:8px; font-size:.7rem; font-weight:600; white-space:nowrap; flex-shrink:0; }
-  .status-badge.selling { background:#4caf50; color:white; }
+  .status-badge.ongoing { background:#4caf50; color:white; }
   .status-badge.reserved { background:#2196f3; color:white; }
-  .status-badge.sold_out { background:#999; color:white; }
+  .status-badge.soldout,
+  .status-badge.completed { background:#999; color:white; }
   .price { color:#ff6f00; font-weight:700; font-size:.95rem; margin-bottom:.15rem; }
   .meta { font-size:.78rem; color:#999; }
 
