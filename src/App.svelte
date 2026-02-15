@@ -105,7 +105,46 @@
       await customAlert('이름을 입력해주세요', '⚠️ 입력 필요');
       return;
     }
+    
+    // 로그인 성공
     isLoggedIn = true;
+    
+    // 이전 검색 기록 불러오기
+    try {
+      const res = await fetch(`/api/search-logs/user/${encodeURIComponent(userName.trim())}?limit=1`);
+      if (res.ok) {
+        const logs = await res.json();
+        if (logs.length > 0) {
+          const lastSearch = logs[0];
+          // 검색어 복원
+          query = lastSearch.query;
+          
+          // 지역 복원
+          try {
+            const savedRegions = JSON.parse(lastSearch.regions);
+            if (Array.isArray(savedRegions)) {
+              // 지역 ID를 기반으로 selectedRegions 복원
+              selectedRegions = [];
+              for (const regionId of savedRegions) {
+                // regions 객체에서 해당 ID를 찾아서 복원
+                for (const [province, districts] of Object.entries(regions)) {
+                  for (const [district, id] of Object.entries(districts)) {
+                    if (id === regionId) {
+                      selectedRegions.push({ province, district, regionId: id });
+                      break;
+                    }
+                  }
+                }
+              }
+            }
+          } catch (err) {
+            console.error('지역 복원 실패:', err);
+          }
+        }
+      }
+    } catch (err) {
+      console.error('검색 기록 불러오기 실패:', err);
+    }
   }
 
   function isAllSelected(province) {
