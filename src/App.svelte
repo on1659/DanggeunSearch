@@ -231,12 +231,29 @@
       await customAlert('지역을 선택해주세요', '⚠️ 지역 선택 필요');
       return;
     }
+    
+    // 검색 전 필수 안내
+    const warningMessage = `
+이 검색기는 당근마켓 웹사이트를 크롤링하는 보조 도구입니다.
+
+⚠️ 주의사항:
+• 이 도구를 맹신하지 마세요
+• 과도한 사용 시 당근마켓으로부터 검색 차단(블랙리스트)될 수 있습니다
+• 검색 후 60초 쿨타임은 차단 방지를 위한 것이니 양해 부탁드립니다
+• 개인적, 비상업적 용도로만 사용해주세요
+
+검색을 계속하시겠습니까?
+    `.trim();
+    
+    const confirmed = await customConfirm(warningMessage, '⚠️ 검색 전 필수 안내');
+    if (!confirmed) return;
+    
     if (selectedRegions.length > 20) {
-      const confirmed = await customConfirm(
+      const confirmed2 = await customConfirm(
         '지역이 20개 이상입니다. 검색 시간이 오래 걸릴 수 있습니다. 계속할까요?',
         '⚠️ 확인 필요'
       );
-      if (!confirmed) return;
+      if (!confirmed2) return;
     }
 
     loading = true;
