@@ -118,7 +118,7 @@ function formatArticle(article, regionId) {
     }
   }
 
-  return {
+  const item = {
     title: article.title || '제목 없음',
     price,
     location: regionName,
@@ -128,6 +128,13 @@ function formatArticle(article, regionId) {
     region: regionName,
     status: article.status || ''
   };
+
+  // Debug: 판매 상태 로그
+  if (article.status) {
+    console.log(`[DEBUG] ${article.title}: status=${article.status}`);
+  }
+
+  return item;
 }
 
 export async function crawlDaangn(query, regionIds, options = {}) {
