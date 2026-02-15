@@ -2,6 +2,7 @@
   import { onMount } from 'svelte';
   import MapSelector from './lib/MapSelector.svelte';
   import CustomAlert from './lib/CustomAlert.svelte';
+  import MyPage from './lib/MyPage.svelte';
 
   let userName = '';
   let isLoggedIn = false;
@@ -23,6 +24,8 @@
   let hideSoldOut = false; // 판매완료 제외
   let lastCenterItemId = null; // 현재 화면 중앙 아이템 추적
   let hasSeenWarning = false; // 세션당 한 번만 경고 표시
+  let currentPage_mode = 'search'; // 'search' | 'mypage'
+  let bookmarkedLinks = new Set(); // 북마크된 아이템 링크
 
   // Custom Alert
   let showAlert = false;
@@ -101,6 +104,71 @@
     return selectedRegions.some(r => r.regionId === regionId);
   }
 
+  // 북마크 로드
+  async function loadBookmarks() {
+    try {
+      const res = await fetch(`/api/bookmarks/${encodeURIComponent(userName.trim())}`);
+      if (res.ok) {
+        const bookmarks = await res.json();
+        bookmarkedLinks = new Set(bookmarks.map(b => b.item_link));
+      }
+    } catch (err) {
+      console.error('북마크 로드 실패:', err);
+    }
+  }
+
+  // 북마크 토글
+  async function toggleBookmark(item, event) {
+    event.preventDefault();
+    event.stopPropagation();
+
+    const isCurrentlyBookmarked = bookmarkedLinks.has(item.link);
+
+    try {
+      if (isCurrentlyBookmarked) {
+        // 북마크 삭제
+        const res = await fetch(`/api/bookmarks/${encodeURIComponent(userName)}/${encodeURIComponent(item.link)}`, {
+          method: 'DELETE'
+        });
+        const result = await res.json();
+        if (result.success) {
+          bookmarkedLinks.delete(item.link);
+          bookmarkedLinks = bookmarkedLinks; // Svelte 반응성 트리거
+        }
+      } else {
+        // 북마크 추가
+        const res = await fetch('/api/bookmarks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userName, item })
+        });
+        const result = await res.json();
+        if (result.success) {
+          bookmarkedLinks.add(item.link);
+          bookmarkedLinks = bookmarkedLinks; // Svelte 반응성 트리거
+        } else {
+          await customAlert(result.error || '북마크 추가 실패', '⚠️ 오류');
+        }
+      }
+    } catch (err) {
+      console.error('북마크 토글 실패:', err);
+      await customAlert('북마크 처리 중 오류가 발생했습니다', '⚠️ 오류');
+    }
+  }
+
+  // 아이템 클릭 저장
+  async function trackItemClick(item) {
+    try {
+      await fetch('/api/clicked-items', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userName, item })
+      });
+    } catch (err) {
+      console.error('클릭 기록 저장 실패:', err);
+    }
+  }
+
   async function handleLogin() {
     if (!userName.trim()) {
       await customAlert('이름을 입력해주세요', '⚠️ 입력 필요');
@@ -109,6 +177,9 @@
     
     // 로그인 성공
     isLoggedIn = true;
+    
+    // 북마크 로드
+    await loadBookmarks();
     
     // 이전 검색 기록 불러오기
     try {
@@ -308,10 +379,25 @@
   {:else}
     <!-- 기존 메인 화면 -->
     <header>
-      <h1>🥕 당근검색기</h1>
-      <p>여러 지역 매물을 한번에</p>
+      <div class="header-left">
+        <button class="back-btn" class:visible={currentPage_mode === 'mypage'} on:click={() => currentPage_mode = 'search'}>
+          ← 검색
+        </button>
+      </div>
+      <div class="header-center">
+        <h1>🥕 당근검색기</h1>
+        <p>여러 지역 매물을 한번에</p>
+      </div>
+      <div class="header-right">
+        <button class="mypage-btn" on:click={() => currentPage_mode = 'mypage'}>
+          👤
+        </button>
+      </div>
     </header>
 
+    {#if currentPage_mode === 'mypage'}
+      <MyPage {userName} />
+    {:else}
     <div class="container">
     <form class="search-bar" on:submit|preventDefault={handleSearch}>
       <input type="text" bind:value={query} placeholder="검색어 입력" disabled={loading || cooldown > 0} />
@@ -451,7 +537,14 @@
 
         <div class="items">
           {#each paginatedItems as item}
-            <a class="item" class:sold-out={item.status && item.status !== 'Ongoing' && item.status !== 'Reserved'} href={item.link} target="_blank" rel="noopener">
+            <a 
+              class="item" 
+              class:sold-out={item.status && item.status !== 'Ongoing' && item.status !== 'Reserved'} 
+              href={item.link} 
+              target="_blank" 
+              rel="noopener"
+              on:click={() => trackItemClick(item)}
+            >
               {#if item.thumbnail}
                 <img src={item.thumbnail} alt="" loading="lazy" />
               {:else}
@@ -460,6 +553,14 @@
               <div class="info">
                 <div class="title-row">
                   <div class="title">{item.title}</div>
+                  <button 
+                    class="bookmark-btn" 
+                    class:bookmarked={bookmarkedLinks.has(item.link)}
+                    on:click={(e) => toggleBookmark(item, e)}
+                    title={bookmarkedLinks.has(item.link) ? '북마크 해제' : '북마크 추가'}
+                  >
+                    {bookmarkedLinks.has(item.link) ? '★' : '☆'}
+                  </button>
                   {#if item.status}
                     <span class="status-badge {item.status.toLowerCase()}">
                       {item.status === 'Ongoing' ? '판매중' :
@@ -512,6 +613,7 @@
       {/if}
     {/if}
     </div>
+    {/if}
   {/if}
 </main>
 
@@ -616,9 +718,21 @@
   header { 
     background:linear-gradient(135deg, #ff6f00 0%, #ff8e53 100%);
     color:white; 
-    text-align:center; 
     padding:1.5rem 1rem;
     box-shadow:0 2px 12px rgba(0,0,0,.08);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    position:relative;
+  }
+  .header-left,
+  .header-right {
+    width:50px;
+    flex-shrink:0;
+  }
+  .header-center {
+    flex:1;
+    text-align:center;
   }
   header h1 { 
     margin:0; 
@@ -631,6 +745,32 @@
     opacity:.95; 
     font-size:.9rem; 
     letter-spacing:0.2px;
+  }
+  .back-btn,
+  .mypage-btn {
+    background:rgba(255,255,255,0.2);
+    border:none;
+    color:white;
+    padding:.6rem .8rem;
+    border-radius:10px;
+    font-size:.9rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .2s;
+    backdrop-filter:blur(10px);
+  }
+  .back-btn {
+    opacity:0;
+    pointer-events:none;
+  }
+  .back-btn.visible {
+    opacity:1;
+    pointer-events:all;
+  }
+  .back-btn:hover,
+  .mypage-btn:hover {
+    background:rgba(255,255,255,0.3);
+    transform:translateY(-1px);
   }
 
   /* 컨테이너 */
@@ -1016,6 +1156,29 @@
     min-width:0;
     letter-spacing:-0.2px;
     color:#212121;
+  }
+  .bookmark-btn {
+    background:none;
+    border:none;
+    font-size:1.3rem;
+    cursor:pointer;
+    padding:.2rem;
+    line-height:1;
+    color:#ddd;
+    transition:all .2s ease;
+    flex-shrink:0;
+  }
+  .bookmark-btn:hover {
+    transform:scale(1.2);
+    color:#ffb300;
+  }
+  .bookmark-btn.bookmarked {
+    color:#ff6f00;
+    animation:bookmarkPop .3s ease;
+  }
+  @keyframes bookmarkPop {
+    0%, 100% { transform:scale(1); }
+    50% { transform:scale(1.3); }
   }
   .status-badge { 
     padding:.3rem .6rem; 

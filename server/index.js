@@ -3,7 +3,17 @@ import cors from 'cors';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { crawlDaangn } from './crawler.js';
-import { logSearch, getRecentSearches, getPopularSearches, getUserSearches } from './database.js';
+import { 
+  logSearch, 
+  getRecentSearches, 
+  getPopularSearches, 
+  getUserSearches,
+  saveClickedItem,
+  getClickedItems,
+  addBookmark,
+  removeBookmark,
+  getBookmarks
+} from './database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -135,6 +145,72 @@ app.get('/api/search-logs/user/:userName', (req, res) => {
     res.json(logs);
   } catch (error) {
     console.error('Error fetching user searches:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 클릭한 아이템 저장 API
+app.post('/api/clicked-items', (req, res) => {
+  try {
+    const { userName, item } = req.body;
+    if (!userName || !item) {
+      return res.status(400).json({ error: 'userName과 item 필수' });
+    }
+    const result = saveClickedItem(userName, item);
+    res.json({ success: result });
+  } catch (error) {
+    console.error('Error saving clicked item:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 클릭 기록 조회 API
+app.get('/api/clicked-items/:userName', (req, res) => {
+  try {
+    const { userName } = req.params;
+    const items = getClickedItems(userName);
+    res.json(items);
+  } catch (error) {
+    console.error('Error fetching clicked items:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 북마크 추가 API
+app.post('/api/bookmarks', (req, res) => {
+  try {
+    const { userName, item } = req.body;
+    if (!userName || !item) {
+      return res.status(400).json({ error: 'userName과 item 필수' });
+    }
+    const result = addBookmark(userName, item);
+    res.json(result);
+  } catch (error) {
+    console.error('Error adding bookmark:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 북마크 삭제 API
+app.delete('/api/bookmarks/:userName/:itemLink', (req, res) => {
+  try {
+    const { userName, itemLink } = req.params;
+    const result = removeBookmark(userName, decodeURIComponent(itemLink));
+    res.json(result);
+  } catch (error) {
+    console.error('Error removing bookmark:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// 북마크 목록 조회 API
+app.get('/api/bookmarks/:userName', (req, res) => {
+  try {
+    const { userName } = req.params;
+    const bookmarks = getBookmarks(userName);
+    res.json(bookmarks);
+  } catch (error) {
+    console.error('Error fetching bookmarks:', error);
     res.status(500).json({ error: error.message });
   }
 });
