@@ -66,7 +66,6 @@
 
   function handleLogin() {
     if (!userName.trim()) return alert('이름을 입력해주세요');
-    query = userName.trim();
     isLoggedIn = true;
   }
 
