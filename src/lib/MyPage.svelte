@@ -159,6 +159,7 @@
     max-width:640px;
     margin:0 auto;
     padding:1rem;
+    overflow-x:hidden;
   }
 
   .mypage-header {
@@ -246,6 +247,8 @@
     display:flex;
     flex-direction:column;
     gap:.8rem;
+    width:100%;
+    overflow-x:hidden;
   }
 
   .item {
@@ -323,23 +326,30 @@
     position:absolute;
     top:.8rem;
     right:.8rem;
-    background:rgba(0,0,0,0.5);
+    background:linear-gradient(135deg, #ff6f00 0%, #ff8e53 100%);
     color:white;
     border:none;
-    width:28px;
-    height:28px;
+    width:32px;
+    height:32px;
     border-radius:50%;
-    font-size:1rem;
+    font-size:1.1rem;
+    font-weight:700;
     cursor:pointer;
     display:flex;
     align-items:center;
     justify-content:center;
-    transition:all .2s;
+    transition:all .3s ease;
+    box-shadow:0 2px 8px rgba(255,111,0,0.3);
   }
 
   .remove-btn:hover {
-    background:rgba(0,0,0,0.7);
-    transform:scale(1.1);
+    background:linear-gradient(135deg, #e65100 0%, #ff6f00 100%);
+    transform:scale(1.15);
+    box-shadow:0 4px 12px rgba(255,111,0,0.5);
+  }
+
+  .remove-btn:active {
+    transform:scale(0.95);
   }
 
   .login-logs {

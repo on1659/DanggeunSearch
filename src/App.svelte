@@ -663,8 +663,18 @@
     background:linear-gradient(180deg, #fff5eb 0%, #fafafa 100%);
     color:#212121; 
     -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  :global(html) {
+    overflow-x:hidden;
   }
   :global(*) { box-sizing:border-box; }
+  
+  main {
+    min-height:100vh;
+    overflow-x:hidden;
+    width:100%;
+  }
 
   /* 로그인 화면 */
   .login-screen { 
@@ -820,7 +830,9 @@
   .container { 
     max-width:640px; 
     margin:0 auto; 
-    padding:1rem; 
+    padding:1rem;
+    overflow-x:hidden;
+    width:100%;
   }
 
   /* 검색바 */
