@@ -251,6 +251,9 @@
 • 개인적, 비상업적 용도로만 사용해주세요
 
 
+• 여긴 검색용만 가능하고, 채팅은 어려울 수도 있습니다
+
+
 검색을 계속하시겠습니까?`;
       
       const confirmed = await customConfirm(warningMessage, '⚠️ 검색 전 필수 안내');
