@@ -116,8 +116,9 @@
   .modal-message {
     font-size: 1rem;
     color: #666;
-    line-height: 1.5;
+    line-height: 1.6;
     margin: 0 0 1.5rem;
+    white-space: pre-line;
   }
 
   .modal-buttons {
