@@ -82,8 +82,13 @@ async function fetchRegionResults(query, regionId, options = {}) {
 }
 
 function formatArticle(article, regionId) {
+  // Debug: 첫 번째 아이템만 전체 구조 출력
+  if (Math.random() < 0.1) { // 10% 확률로 샘플 출력
+    console.log('[DEBUG] Article structure:', JSON.stringify(article, null, 2));
+  }
+
   const regionName = article.region?.name || article.regionId?.name || regionId.split('-')[0];
-  
+
   // Format price
   let price = '';
   if (article.price) {
