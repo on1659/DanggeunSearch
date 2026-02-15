@@ -1,6 +1,7 @@
 <script>
   import { onMount } from 'svelte';
   import MapSelector from './lib/MapSelector.svelte';
+  import CustomAlert from './lib/CustomAlert.svelte';
 
   let userName = '';
   let isLoggedIn = false;
@@ -19,6 +20,35 @@
   let searchWithinQuery = '';
   let filterRegion = '';
   let viewMode = 'list'; // 'list' | 'map'
+
+  // Custom Alert
+  let showAlert = false;
+  let alertTitle = '';
+  let alertMessage = '';
+  let alertType = 'alert';
+  let alertOnConfirm = () => {};
+  let alertOnCancel = () => {};
+
+  function customAlert(message, title = '') {
+    alertMessage = message;
+    alertTitle = title;
+    alertType = 'alert';
+    showAlert = true;
+    return new Promise(resolve => {
+      alertOnConfirm = () => resolve(true);
+    });
+  }
+
+  function customConfirm(message, title = '') {
+    alertMessage = message;
+    alertTitle = title;
+    alertType = 'confirm';
+    showAlert = true;
+    return new Promise(resolve => {
+      alertOnConfirm = () => resolve(true);
+      alertOnCancel = () => resolve(false);
+    });
+  }
 
   $: provinces = Object.keys(regions);
   $: districts = selectedProvince ? Object.entries(regions[selectedProvince] || {}) : [];
@@ -64,8 +94,11 @@
     return selectedRegions.some(r => r.regionId === regionId);
   }
 
-  function handleLogin() {
-    if (!userName.trim()) return alert('이름을 입력해주세요');
+  async function handleLogin() {
+    if (!userName.trim()) {
+      await customAlert('이름을 입력해주세요', '⚠️ 입력 필요');
+      return;
+    }
     isLoggedIn = true;
   }
 
@@ -112,10 +145,20 @@
   }
 
   async function handleSearch() {
-    if (!query.trim()) return alert('검색어를 입력해주세요');
-    if (selectedRegions.length === 0) return alert('지역을 선택해주세요');
+    if (!query.trim()) {
+      await customAlert('검색어를 입력해주세요', '⚠️ 입력 필요');
+      return;
+    }
+    if (selectedRegions.length === 0) {
+      await customAlert('지역을 선택해주세요', '⚠️ 지역 선택 필요');
+      return;
+    }
     if (selectedRegions.length > 20) {
-      if (!confirm('지역이 20개 이상입니다. 검색 시간이 오래 걸릴 수 있습니다. 계속할까요?')) return;
+      const confirmed = await customConfirm(
+        '지역이 20개 이상입니다. 검색 시간이 오래 걸릴 수 있습니다. 계속할까요?',
+        '⚠️ 확인 필요'
+      );
+      if (!confirmed) return;
     }
 
     loading = true;
@@ -359,6 +402,16 @@
     </div>
   {/if}
 </main>
+
+<!-- Custom Alert Modal -->
+<CustomAlert
+  bind:show={showAlert}
+  {alertTitle}
+  message={alertMessage}
+  type={alertType}
+  onConfirm={alertOnConfirm}
+  onCancel={alertOnCancel}
+/>
 
 <style>
   :global(body) { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif; background:#f7f7f7; color:#333; }
