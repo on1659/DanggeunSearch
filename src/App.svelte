@@ -21,6 +21,7 @@
   let filterRegion = '';
   let viewMode = 'list'; // 'list' | 'map'
   let hideSoldOut = false; // 판매완료 제외
+  let lastCenterItemId = null; // 현재 화면 중앙 아이템 추적
 
   // Custom Alert
   let showAlert = false;
@@ -54,7 +55,7 @@
   $: provinces = Object.keys(regions);
   $: districts = selectedProvince ? Object.entries(regions[selectedProvince] || {}) : [];
 
-  $: filteredItems = (searchResults?.items || [])
+  $: allFilteredItems = (searchResults?.items || [])
     .filter(item => {
       if (searchWithinQuery && !item.title.toLowerCase().includes(searchWithinQuery.toLowerCase()) &&
           !item.location.toLowerCase().includes(searchWithinQuery.toLowerCase())) return false;
@@ -63,6 +64,8 @@
       if (hideSoldOut && item.status && item.status !== 'Ongoing' && item.status !== 'Reserved') return false;
       return true;
     });
+
+  $: filteredItems = allFilteredItems;
 
   $: uniqueRegions = [...new Set(searchResults?.items.map(i => i.location) || [])];
   $: totalPages = Math.ceil((filteredItems?.length || 0) / itemsPerPage);
@@ -145,6 +148,39 @@
     searchWithinQuery = '';
     filterRegion = '';
     currentPage = 1;
+    lastCenterItemId = null;
+  }
+
+  // 필터 변경 시 현재 중앙 아이템 기준으로 페이지 유지
+  function handleFilterChange() {
+    // 다음 틱까지 기다려서 allFilteredItems가 업데이트되도록
+    setTimeout(() => {
+      if (!lastCenterItemId || !allFilteredItems.length) {
+        currentPage = 1;
+        return;
+      }
+
+      // 필터링 후 중앙 아이템 찾기
+      const newIndex = allFilteredItems.findIndex(item => item.link === lastCenterItemId);
+      
+      if (newIndex === -1) {
+        currentPage = 1;
+      } else {
+        // 해당 아이템이 보이도록 페이지 계산
+        const newPage = Math.floor(newIndex / itemsPerPage) + 1;
+        const maxPage = Math.ceil(allFilteredItems.length / itemsPerPage);
+        currentPage = Math.min(Math.max(1, newPage), maxPage || 1);
+      }
+    }, 0);
+  }
+
+  // 현재 페이지의 중앙 아이템 추적
+  $: if (paginatedItems && paginatedItems.length > 0) {
+    const centerIndex = Math.floor(paginatedItems.length / 2);
+    const centerItem = paginatedItems[centerIndex];
+    if (centerItem) {
+      lastCenterItemId = centerItem.link;
+    }
   }
 
   async function handleSearch() {
@@ -338,12 +374,13 @@
             <option value={10}>10개씩</option>
             <option value={20}>20개씩</option>
             <option value={50}>50개씩</option>
+            <option value={100}>100개씩</option>
           </select>
           <label>
             <input
               type="checkbox"
               bind:checked={hideSoldOut}
-              on:change={() => currentPage = 1}
+              on:change={handleFilterChange}
             />
             판매완료 제외
           </label>
