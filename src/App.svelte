@@ -26,6 +26,8 @@
   let hasSeenWarning = false; // 세션당 한 번만 경고 표시
   let currentPage_mode = 'search'; // 'search' | 'mypage'
   let bookmarkedLinks = new Set(); // 북마크된 아이템 링크
+  let recentRegions = []; // 최근 사용 지역 3개
+  let searchHistory = []; // 최근 검색 기록
 
   // Custom Alert
   let showAlert = false;
@@ -117,6 +119,88 @@
     }
   }
 
+  // 최근 지역 저장 (최대 3개, 중복 제거)
+  function saveRecentRegions() {
+    if (selectedRegions.length === 0) return;
+    
+    // 현재 선택된 지역 ID 목록
+    const currentRegionIds = selectedRegions.map(r => r.regionId);
+    
+    // localStorage에서 기존 기록 불러오기
+    let recent = [];
+    try {
+      const saved = localStorage.getItem(`recentRegions_${userName}`);
+      if (saved) recent = JSON.parse(saved);
+    } catch (e) {}
+    
+    // 현재 선택된 지역들을 최근 목록에 추가 (중복 제거)
+    for (const region of selectedRegions) {
+      // 기존 목록에서 같은 지역 제거
+      recent = recent.filter(r => r.regionId !== region.regionId);
+      // 맨 앞에 추가
+      recent.unshift(region);
+    }
+    
+    // 최대 3개만 유지
+    recent = recent.slice(0, 3);
+    
+    // 저장
+    localStorage.setItem(`recentRegions_${userName}`, JSON.stringify(recent));
+    recentRegions = recent;
+  }
+
+  // 최근 지역 불러오기
+  function loadRecentRegions() {
+    try {
+      const saved = localStorage.getItem(`recentRegions_${userName}`);
+      if (saved) {
+        recentRegions = JSON.parse(saved);
+      }
+    } catch (e) {
+      console.error('최근 지역 불러오기 실패:', e);
+    }
+  }
+
+  // 최근 검색 기록 불러오기 (search_logs에서)
+  async function loadSearchHistory() {
+    try {
+      const res = await fetch(`/api/search-logs/user/${encodeURIComponent(userName)}?limit=5`);
+      if (res.ok) {
+        searchHistory = await res.json();
+      }
+    } catch (err) {
+      console.error('검색 기록 불러오기 실패:', err);
+    }
+  }
+
+  // 검색 기록에서 복원
+  async function restoreFromHistory(historyItem) {
+    query = historyItem.query;
+    
+    // 지역 복원
+    try {
+      const savedRegions = JSON.parse(historyItem.regions);
+      if (Array.isArray(savedRegions)) {
+        selectedRegions = [];
+        for (const regionId of savedRegions) {
+          for (const [province, districts] of Object.entries(regions)) {
+            for (const [district, id] of Object.entries(districts)) {
+              if (id === regionId) {
+                selectedRegions.push({ province, district, regionId: id });
+                break;
+              }
+            }
+          }
+        }
+      }
+    } catch (err) {
+      console.error('지역 복원 실패:', err);
+    }
+    
+    // 재검색 (과거 기록 플래그 설정)
+    await handleSearch(true);
+  }
+
   // 북마크 토글
   async function toggleBookmark(item, event) {
     event.preventDefault();
@@ -179,6 +263,8 @@
     bookmarkedLinks = new Set();
     currentPage_mode = 'search';
     hasSeenWarning = false;
+    recentRegions = [];
+    searchHistory = [];
   }
 
   async function handleLogin() {
@@ -203,6 +289,12 @@
     
     // 북마크 로드
     await loadBookmarks();
+    
+    // 최근 지역 로드
+    loadRecentRegions();
+    
+    // 검색 기록 로드
+    await loadSearchHistory();
     
     // 이전 검색 기록 불러오기
     try {
@@ -317,7 +409,7 @@
     }
   }
 
-  async function handleSearch() {
+  async function handleSearch(isFromHistory = false) {
     if (!query.trim()) {
       await customAlert('검색어를 입력해주세요', '⚠️ 입력 필요');
       return;
@@ -373,7 +465,15 @@
       }
       if (!res.ok) throw new Error(`검색 실패 (${res.status})`);
       searchResults = await res.json();
+      searchResults.isFromHistory = isFromHistory;
       resetFilters();
+      
+      // 검색 성공 시 최근 지역 저장
+      if (!isFromHistory) {
+        saveRecentRegions();
+        // 검색 기록 새로고침
+        setTimeout(() => loadSearchHistory(), 1000);
+      }
     } catch (err) {
       error = err.message;
     } finally {
@@ -428,6 +528,24 @@
       <MyPage {userName} />
     {:else}
     <div class="container">
+    
+    <!-- 최근 검색 기록 -->
+    {#if searchHistory.length > 0 && !searchResults}
+      <div class="search-history-section">
+        <h3>최근 검색</h3>
+        <div class="history-list">
+          {#each searchHistory as history}
+            <button class="history-item" on:click={() => restoreFromHistory(history)}>
+              <div class="history-query">{history.query}</div>
+              <div class="history-meta">
+                {history.region_count}개 지역 · {new Date(history.timestamp).toLocaleDateString('ko-KR')}
+              </div>
+            </button>
+          {/each}
+        </div>
+      </div>
+    {/if}
+    
     <form class="search-bar" on:submit|preventDefault={handleSearch}>
       <input type="text" bind:value={query} placeholder="검색어 입력" disabled={loading || cooldown > 0} />
       <button type="submit" disabled={loading || selectedRegions.length === 0 || cooldown > 0}>
@@ -444,6 +562,25 @@
         {/if}
         <span class="arrow">{showRegionPicker ? '▲' : '▼'}</span>
       </button>
+
+      <!-- 최근 사용 지역 (최대 3개) -->
+      {#if recentRegions.length > 0 && selectedRegions.length === 0 && !showRegionPicker}
+        <div class="recent-regions">
+          <div class="recent-label">최근 사용 지역</div>
+          <div class="recent-tags">
+            {#each recentRegions as region}
+              <button 
+                class="recent-tag" 
+                on:click={() => {
+                  selectedRegions = [region];
+                }}
+              >
+                {region.district}
+              </button>
+            {/each}
+          </div>
+        </div>
+      {/if}
 
       {#if selectedRegions.length > 0}
         <div class="selected-tags">
@@ -527,6 +664,9 @@
 
     {#if searchResults}
       <div class="results-header">
+        {#if searchResults.isFromHistory}
+          <span class="history-badge">📜 과거 기록</span>
+        {/if}
         "{searchResults.query}" · {searchResults.totalItems}개
       </div>
 
@@ -1137,6 +1277,112 @@
     margin-bottom:.8rem;
     font-weight:600;
     letter-spacing:-0.2px;
+    display:flex;
+    align-items:center;
+    gap:.5rem;
+    flex-wrap:wrap;
+  }
+
+  .history-badge {
+    background:linear-gradient(135deg, #ff6f00 0%, #ff8e53 100%);
+    color:white;
+    padding:.3rem .6rem;
+    border-radius:12px;
+    font-size:.75rem;
+    font-weight:700;
+    letter-spacing:0.3px;
+  }
+
+  /* 최근 검색 기록 */
+  .search-history-section {
+    background:white;
+    border-radius:20px;
+    padding:1.2rem;
+    margin-bottom:1rem;
+    box-shadow:0 2px 12px rgba(0,0,0,.06), 0 0 0 1px rgba(0,0,0,.02);
+  }
+
+  .search-history-section h3 {
+    margin:0 0 .8rem;
+    font-size:1.05rem;
+    font-weight:700;
+    color:#212121;
+    letter-spacing:-0.3px;
+  }
+
+  .history-list {
+    display:flex;
+    flex-direction:column;
+    gap:.5rem;
+  }
+
+  .history-item {
+    background:#f9f9f9;
+    border:2px solid #e0e0e0;
+    border-radius:12px;
+    padding:.8rem 1rem;
+    text-align:left;
+    cursor:pointer;
+    transition:all .2s ease;
+    width:100%;
+  }
+
+  .history-item:hover {
+    background:#fff8f0;
+    border-color:#ffb74d;
+    transform:translateX(4px);
+  }
+
+  .history-query {
+    font-size:.95rem;
+    font-weight:600;
+    color:#212121;
+    margin-bottom:.3rem;
+  }
+
+  .history-meta {
+    font-size:.8rem;
+    color:#9e9e9e;
+  }
+
+  /* 최근 사용 지역 */
+  .recent-regions {
+    margin-top:.8rem;
+    padding-top:.8rem;
+    border-top:1px solid #f5f5f5;
+  }
+
+  .recent-label {
+    font-size:.85rem;
+    color:#757575;
+    margin-bottom:.5rem;
+    font-weight:600;
+  }
+
+  .recent-tags {
+    display:flex;
+    gap:.5rem;
+    flex-wrap:wrap;
+  }
+
+  .recent-tag {
+    background:linear-gradient(135deg, #fff8f0 0%, #fff3e0 100%);
+    border:2px solid #ffcc80;
+    color:#ff6f00;
+    padding:.5rem .9rem;
+    border-radius:16px;
+    font-size:.85rem;
+    font-weight:600;
+    cursor:pointer;
+    transition:all .2s ease;
+  }
+
+  .recent-tag:hover {
+    background:linear-gradient(135deg, #ff6f00 0%, #ff8e53 100%);
+    color:white;
+    border-color:transparent;
+    transform:translateY(-2px);
+    box-shadow:0 4px 12px rgba(255,111,0,0.3);
   }
 
   /* 아이템 리스트 */
