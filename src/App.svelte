@@ -87,6 +87,11 @@
       const res = await fetch('/api/regions');
       regions = await res.json();
     } catch { error = '지역 데이터 로드 실패'; }
+
+    // 전역 alert 이벤트 리스너
+    window.addEventListener('showAlert', (e) => {
+      customAlert(e.detail.message, e.detail.title || '⚠️ 알림');
+    });
   });
 
   function toggleDistrict(province, district, regionId) {

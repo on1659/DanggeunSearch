@@ -48,6 +48,16 @@
 
     const isCurrentlyBookmarked = bookmarkedLinks.has(item.item_link);
 
+    // item 객체를 API 형식에 맞게 변환
+    const normalizedItem = {
+      link: item.item_link,
+      title: item.item_title,
+      price: item.item_price,
+      location: item.item_location,
+      thumbnail: item.item_thumbnail,
+      status: item.item_status
+    };
+
     try {
       if (isCurrentlyBookmarked) {
         // 북마크 삭제
@@ -64,7 +74,7 @@
         const res = await fetch('/api/bookmarks', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userName, item })
+          body: JSON.stringify({ userName, item: normalizedItem })
         });
         const result = await res.json();
         if (result.success) {
@@ -76,11 +86,17 @@
             bookmarks = await bookmarkRes.json();
           }
         } else {
-          alert(result.error || '북마크 추가 실패');
+          // 커스텀 alert 표시 - 부모로 이벤트 전달
+          window.dispatchEvent(new CustomEvent('showAlert', { 
+            detail: { message: result.error || '북마크 추가 실패' }
+          }));
         }
       }
     } catch (err) {
       console.error('북마크 토글 실패:', err);
+      window.dispatchEvent(new CustomEvent('showAlert', { 
+        detail: { message: '북마크 처리 중 오류가 발생했습니다' }
+      }));
     }
   }
 </script>
