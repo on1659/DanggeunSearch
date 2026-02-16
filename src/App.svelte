@@ -105,6 +105,8 @@
 
   function removeRegion(regionId) {
     selectedRegions = selectedRegions.filter(r => r.regionId !== regionId);
+    // 동기화를 위해 강제 업데이트
+    selectedRegions = [...selectedRegions];
   }
 
   function isSelected(regionId) {
@@ -163,6 +165,26 @@
       }
     } catch (e) {
       console.error('최근 지역 불러오기 실패:', e);
+    }
+    
+    // viewMode 불러오기
+    try {
+      const savedMode = localStorage.getItem(`viewMode_${userName}`);
+      if (savedMode === 'list' || savedMode === 'map') {
+        viewMode = savedMode;
+      }
+    } catch (e) {
+      console.error('viewMode 불러오기 실패:', e);
+    }
+  }
+
+  // viewMode 저장
+  function saveViewMode(mode) {
+    viewMode = mode;
+    try {
+      localStorage.setItem(`viewMode_${userName}`, mode);
+    } catch (e) {
+      console.error('viewMode 저장 실패:', e);
     }
   }
 
@@ -621,11 +643,11 @@
           <div class="tabs">
             <button
               class:active={viewMode === 'list'}
-              on:click={() => viewMode = 'list'}
+              on:click={() => saveViewMode('list')}
             >목록 선택</button>
             <button
               class:active={viewMode === 'map'}
-              on:click={() => viewMode = 'map'}
+              on:click={() => saveViewMode('map')}
             >지도 선택</button>
           </div>
 
