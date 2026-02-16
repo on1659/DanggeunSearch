@@ -92,6 +92,17 @@
     window.addEventListener('showAlert', (e) => {
       customAlert(e.detail.message, e.detail.title || '⚠️ 알림');
     });
+
+    // 저장된 로그인 상태 복원
+    try {
+      const savedUser = localStorage.getItem('loggedInUser');
+      if (savedUser) {
+        userName = savedUser;
+        await handleLogin(true); // skipLoginLog=true
+      }
+    } catch (e) {
+      console.error('로그인 상태 복원 실패:', e);
+    }
   });
 
   function toggleDistrict(province, district, regionId) {
@@ -297,6 +308,13 @@
   }
 
   function handleLogout() {
+    // localStorage에서 로그인 상태 제거
+    try {
+      localStorage.removeItem('loggedInUser');
+    } catch (e) {
+      console.error('로그인 상태 삭제 실패:', e);
+    }
+    
     // 상태 초기화
     isLoggedIn = false;
     userName = '';
@@ -310,25 +328,34 @@
     searchHistory = [];
   }
 
-  async function handleLogin() {
+  async function handleLogin(skipLoginLog = false) {
     if (!userName.trim()) {
       await customAlert('이름을 입력해주세요', '⚠️ 입력 필요');
       return;
     }
     
-    // 로그인 기록 저장
-    try {
-      await fetch('/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userName: userName.trim() })
-      });
-    } catch (err) {
-      console.error('로그인 기록 저장 실패:', err);
+    // 로그인 기록 저장 (새로고침 복원 시에는 제외)
+    if (!skipLoginLog) {
+      try {
+        await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userName: userName.trim() })
+        });
+      } catch (err) {
+        console.error('로그인 기록 저장 실패:', err);
+      }
     }
     
     // 로그인 성공
     isLoggedIn = true;
+    
+    // 로그인 상태 저장
+    try {
+      localStorage.setItem('loggedInUser', userName.trim());
+    } catch (e) {
+      console.error('로그인 상태 저장 실패:', e);
+    }
     
     // 북마크 로드
     await loadBookmarks();
@@ -339,7 +366,7 @@
     // 검색 기록 로드
     await loadSearchHistory();
     
-    // 이전 검색 기록 불러오기
+    // 이전 검색어/지역 복원
     try {
       const res = await fetch(`/api/search-logs/user/${encodeURIComponent(userName.trim())}?limit=1`);
       if (res.ok) {
@@ -353,10 +380,8 @@
           try {
             const savedRegions = JSON.parse(lastSearch.regions);
             if (Array.isArray(savedRegions)) {
-              // 지역 ID를 기반으로 selectedRegions 복원
               selectedRegions = [];
               for (const regionId of savedRegions) {
-                // regions 객체에서 해당 ID를 찾아서 복원
                 for (const [province, districts] of Object.entries(regions)) {
                   for (const [district, id] of Object.entries(districts)) {
                     if (id === regionId) {
