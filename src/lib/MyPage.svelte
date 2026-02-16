@@ -8,6 +8,7 @@
   let bookmarks = [];
   let loginLogs = [];
   let loading = false;
+  let bookmarkedLinks = new Set();
 
   onMount(async () => {
     await loadData();
@@ -26,6 +27,7 @@
       const bookmarkRes = await fetch(`/api/bookmarks/${encodeURIComponent(userName)}`);
       if (bookmarkRes.ok) {
         bookmarks = await bookmarkRes.json();
+        bookmarkedLinks = new Set(bookmarks.map(b => b.item_link));
       }
 
       // 로그인 기록 로드
@@ -40,17 +42,45 @@
     }
   }
 
-  async function removeBookmark(itemLink, event) {
+  async function toggleBookmark(item, event) {
     event.preventDefault();
+    event.stopPropagation();
+
+    const isCurrentlyBookmarked = bookmarkedLinks.has(item.item_link);
+
     try {
-      const res = await fetch(`/api/bookmarks/${encodeURIComponent(userName)}/${encodeURIComponent(itemLink)}`, {
-        method: 'DELETE'
-      });
-      if (res.ok) {
-        bookmarks = bookmarks.filter(b => b.item_link !== itemLink);
+      if (isCurrentlyBookmarked) {
+        // 북마크 삭제
+        const res = await fetch(`/api/bookmarks/${encodeURIComponent(userName)}/${encodeURIComponent(item.item_link)}`, {
+          method: 'DELETE'
+        });
+        if (res.ok) {
+          bookmarkedLinks.delete(item.item_link);
+          bookmarkedLinks = bookmarkedLinks;
+          bookmarks = bookmarks.filter(b => b.item_link !== item.item_link);
+        }
+      } else {
+        // 북마크 추가
+        const res = await fetch('/api/bookmarks', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userName, item })
+        });
+        const result = await res.json();
+        if (result.success) {
+          bookmarkedLinks.add(item.item_link);
+          bookmarkedLinks = bookmarkedLinks;
+          // 북마크 목록 새로고침
+          const bookmarkRes = await fetch(`/api/bookmarks/${encodeURIComponent(userName)}`);
+          if (bookmarkRes.ok) {
+            bookmarks = await bookmarkRes.json();
+          }
+        } else {
+          alert(result.error || '북마크 추가 실패');
+        }
       }
     } catch (err) {
-      console.error('북마크 삭제 실패:', err);
+      console.error('북마크 토글 실패:', err);
     }
   }
 </script>
@@ -103,6 +133,14 @@
               <div class="price">{item.item_price}</div>
               <div class="meta">{item.item_location}</div>
             </div>
+            <button 
+              class="bookmark-btn" 
+              class:bookmarked={bookmarkedLinks.has(item.item_link)}
+              on:click={(e) => toggleBookmark(item, e)}
+              title={bookmarkedLinks.has(item.item_link) ? '북마크 해제' : '북마크 추가'}
+            >
+              {bookmarkedLinks.has(item.item_link) ? '★' : '☆'}
+            </button>
           </a>
         {/each}
       </div>
@@ -125,11 +163,11 @@
               <div class="meta">{item.item_location}</div>
             </div>
             <button 
-              class="remove-btn" 
-              on:click={(e) => removeBookmark(item.item_link, e)}
-              title="북마크 삭제"
+              class="bookmark-btn bookmarked" 
+              on:click={(e) => toggleBookmark(item, e)}
+              title="북마크 해제"
             >
-              ✕
+              ★
             </button>
           </a>
         {/each}
@@ -322,34 +360,34 @@
     letter-spacing:-0.1px;
   }
 
-  .remove-btn {
+  .bookmark-btn {
     position:absolute;
     top:.8rem;
     right:.8rem;
-    background:linear-gradient(135deg, #ff6f00 0%, #ff8e53 100%);
-    color:white;
+    background:none;
     border:none;
-    width:32px;
-    height:32px;
-    border-radius:50%;
-    font-size:1.1rem;
-    font-weight:700;
+    font-size:1.5rem;
     cursor:pointer;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    transition:all .3s ease;
-    box-shadow:0 2px 8px rgba(255,111,0,0.3);
+    padding:.2rem;
+    line-height:1;
+    color:#ddd;
+    transition:all .2s ease;
+    flex-shrink:0;
   }
 
-  .remove-btn:hover {
-    background:linear-gradient(135deg, #e65100 0%, #ff6f00 100%);
-    transform:scale(1.15);
-    box-shadow:0 4px 12px rgba(255,111,0,0.5);
+  .bookmark-btn:hover {
+    transform:scale(1.2);
+    color:#ffb300;
   }
 
-  .remove-btn:active {
-    transform:scale(0.95);
+  .bookmark-btn.bookmarked {
+    color:#ff6f00;
+    animation:bookmarkPop .3s ease;
+  }
+
+  @keyframes bookmarkPop {
+    0%, 100% { transform:scale(1); }
+    50% { transform:scale(1.3); }
   }
 
   .login-logs {
