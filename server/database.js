@@ -9,54 +9,71 @@ const __dirname = path.dirname(__filename);
 const dbPath = path.join(__dirname, 'search_logs.db');
 const db = new Database(dbPath);
 
-// 테이블 생성
-db.exec(`
-  CREATE TABLE IF NOT EXISTS search_logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_name TEXT,
-    query TEXT NOT NULL,
-    regions TEXT,
-    region_count INTEGER,
-    result_count INTEGER,
-    ip_address TEXT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
+// 테이블 생성 (각각 개별 실행)
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS search_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_name TEXT,
+      query TEXT NOT NULL,
+      regions TEXT,
+      region_count INTEGER,
+      result_count INTEGER,
+      ip_address TEXT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+} catch (e) { console.error('search_logs table error:', e); }
 
-  CREATE TABLE IF NOT EXISTS clicked_items (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_name TEXT NOT NULL,
-    item_link TEXT NOT NULL,
-    item_title TEXT,
-    item_price TEXT,
-    item_location TEXT,
-    item_thumbnail TEXT,
-    item_status TEXT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_name, item_link)
-  );
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS clicked_items (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_name TEXT NOT NULL,
+      item_link TEXT NOT NULL,
+      item_title TEXT,
+      item_price TEXT,
+      item_location TEXT,
+      item_thumbnail TEXT,
+      item_status TEXT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_name, item_link)
+    )
+  `);
+} catch (e) { console.error('clicked_items table error:', e); }
 
-  CREATE TABLE IF NOT EXISTS bookmarks (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_name TEXT NOT NULL,
-    item_link TEXT NOT NULL,
-    item_title TEXT,
-    item_price TEXT,
-    item_location TEXT,
-    item_thumbnail TEXT,
-    item_status TEXT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
-    UNIQUE(user_name, item_link)
-  );
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS bookmarks (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_name TEXT NOT NULL,
+      item_link TEXT NOT NULL,
+      item_title TEXT,
+      item_price TEXT,
+      item_location TEXT,
+      item_thumbnail TEXT,
+      item_status TEXT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE(user_name, item_link)
+    )
+  `);
+} catch (e) { console.error('bookmarks table error:', e); }
 
-  CREATE TABLE IF NOT EXISTS login_logs (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_name TEXT NOT NULL,
-    ip_address TEXT,
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
-`);
+try {
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS login_logs (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      user_name TEXT NOT NULL,
+      ip_address TEXT,
+      timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
+} catch (e) { console.error('login_logs table error:', e); }
 
+// 생성된 테이블 확인
+const createdTables = db.prepare("SELECT name FROM sqlite_master WHERE type='table'").all();
 console.log('✅ Database initialized:', dbPath);
+console.log('📊 Tables:', createdTables.map(t => t.name).join(', '));
 
 // 검색 기록 저장
 export function logSearch(data) {
