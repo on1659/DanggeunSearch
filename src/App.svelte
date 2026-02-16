@@ -169,9 +169,17 @@
   // 최근 검색 기록 불러오기 (search_logs에서)
   async function loadSearchHistory() {
     try {
-      const res = await fetch(`/api/search-logs/user/${encodeURIComponent(userName)}?limit=5`);
+      const res = await fetch(`/api/search-logs/user/${encodeURIComponent(userName)}?limit=20`);
       if (res.ok) {
-        searchHistory = await res.json();
+        const logs = await res.json();
+        // 중복 제거: 같은 검색어는 최근 것만 표시
+        const uniqueQueries = new Map();
+        for (const log of logs) {
+          if (!uniqueQueries.has(log.query)) {
+            uniqueQueries.set(log.query, log);
+          }
+        }
+        searchHistory = Array.from(uniqueQueries.values()).slice(0, 5);
       }
     } catch (err) {
       console.error('검색 기록 불러오기 실패:', err);
@@ -180,6 +188,14 @@
 
   // 검색 기록에서 복원
   async function restoreFromHistory(historyItem) {
+    // 안내 팝업 표시
+    const confirmed = await customConfirm(
+      `"${historyItem.query}" 검색을 실시간으로 다시 불러옵니다.\n\n최신 매물 정보를 확인하시겠습니까?`,
+      '🔄 검색 기록 불러오기'
+    );
+    
+    if (!confirmed) return;
+    
     query = historyItem.query;
     
     // 지역 복원
